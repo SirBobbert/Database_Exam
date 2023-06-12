@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, request
 from neo4j import GraphDatabase
+from flask import Flask, request, jsonify
+import networkx as nx
 
 app = Flask(__name__)
 
@@ -10,9 +12,9 @@ def hello_world():
 def convert_node_to_dict(node):
     return dict(node)
 
+driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "12345678"))
 
 def execute_query_and_process_result(query):
-    driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "12345678"))
     with driver.session() as session:
         result = session.run(query)
         records = []
@@ -35,9 +37,52 @@ def get_products(category):
     MATCH (product:Product)-[:CATEGORIZED_AS]->(category)
     RETURN product LIMIT 50
     """
-    
     products = execute_query_and_process_result(query)
     return jsonify(products)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def find_category_by_product_id(product_id):
+    # Define the Cypher query to retrieve the category based on the product ID
+    query = f"""
+    MATCH (product:Product {{id: '{product_id}'}})
+    MATCH (product)-[:CATEGORIZED_AS]->(category:Category)
+    RETURN category.name AS Category
+    """
+
+    # Execute the query and retrieve the category
+    with driver.session() as session:
+        result = session.run(query)
+        category = result.single()["Category"]
+
+    # Close the Neo4j driver
+    driver.close()
+
+    return category
+
+
+@app.route('/category/<product_id>', methods=['GET'])
+def category_endpoint(product_id):
+    category = find_category_by_product_id(product_id)
+    return jsonify({"Category": category})
+
+
+
+
+
 
 
 
