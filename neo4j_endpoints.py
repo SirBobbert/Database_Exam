@@ -28,6 +28,10 @@ def execute_query_and_process_result(query):
     return records
 
 
+
+
+
+
 # Takes a category as parameter, then returns 50 products
 @app.route('/products/<category>', methods=['GET'])
 def get_products(category):
@@ -42,19 +46,9 @@ def get_products(category):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Takes productID as parameter
+# Finds top 15 products based on average rating
+# Based on ProductID
 def find_top_products(product_id):
     category_query = f"""
     MATCH (product:Product {{id: '{product_id}'}})
@@ -81,17 +75,49 @@ def find_top_products(product_id):
 
     return top_products
 
-@app.route('/findMatchinProducts/<product_id>', methods=['GET'])
+@app.route('/findMatchingProducts/<product_id>', methods=['GET'])
 def category_endpoint(product_id):
     category = find_top_products(product_id)
     return jsonify({"Category": category})
 
 
 
+# Shows top 10 categories based on the degree centrality algorithm
+@app.route('/topCategories', methods=['GET'])
+def top_categories_endpoint():
+    query = """
+    MATCH (c:Category)
+    OPTIONAL MATCH (p:Product)-[:CATEGORIZED_AS]->(c)
+    WITH c, count(p) AS degreeCentrality
+    ORDER BY degreeCentrality DESC
+    RETURN c.name AS name, degreeCentrality
+    LIMIT 10
+    """
+
+    with driver.session() as session:
+        result = session.run(query)
+        categories = [{"name": record["name"], "degreeCentrality": record["degreeCentrality"]} for record in result]
+
+    return jsonify({"categories": categories})
 
 
 
+# Finds top 10 items with the highest average rating
+@app.route('/topItems', methods=['GET'])
+def top_items_endpoint():
+    query = """
+    MATCH (p:Product)
+    WITH p, p.`Average Rating` AS averageRating
+    ORDER BY averageRating DESC
+    RETURN p
+    LIMIT 50
+    """
 
+    with driver.session() as session:
+        result = session.run(query)
+        items = [dict(record["p"]) for record in result]
+
+    return jsonify({"items": items})
 
 
 
