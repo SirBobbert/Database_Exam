@@ -55,28 +55,35 @@ def get_products(category):
 
 
 
-def find_category_by_product_id(product_id):
-    # Define the Cypher query to retrieve the category based on the product ID
-    query = f"""
+def find_top_products(product_id):
+    category_query = f"""
     MATCH (product:Product {{id: '{product_id}'}})
     MATCH (product)-[:CATEGORIZED_AS]->(category:Category)
     RETURN category.name AS Category
     """
-
-    # Execute the query and retrieve the category
     with driver.session() as session:
-        result = session.run(query)
-        category = result.single()["Category"]
+        category_result = session.run(category_query)
+        category = category_result.single()["Category"]
+
+    top_products_query = f"""
+    MATCH (product:Product)-[:CATEGORIZED_AS]->(:Category {{name: '{category}'}})
+    RETURN product
+    ORDER BY product.`Average Rating` DESC
+    LIMIT 15
+    """
+
+    with driver.session() as session:
+        result = session.run(top_products_query)
+        top_products = [dict(record["product"]) for record in result]
 
     # Close the Neo4j driver
     driver.close()
 
-    return category
+    return top_products
 
-
-@app.route('/category/<product_id>', methods=['GET'])
+@app.route('/findMatchinProducts/<product_id>', methods=['GET'])
 def category_endpoint(product_id):
-    category = find_category_by_product_id(product_id)
+    category = find_top_products(product_id)
     return jsonify({"Category": category})
 
 
