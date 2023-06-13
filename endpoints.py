@@ -1,21 +1,40 @@
-from flask import Flask, jsonify, request
-from neo4j import GraphDatabase
-from flask import Flask, request, jsonify
 import networkx as nx
 import redis
 import json
+import os
+import pyodbc
 
+from flask import Flask, app, jsonify, request
+from dotenv import load_dotenv
+from neo4j import GraphDatabase
 
 app = Flask(__name__)
 
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
+# Load ENV variables
+load_dotenv()
 
+# Redis config
+r = redis.Redis(
+    host='redis-16589.c250.eu-central-1-1.ec2.cloud.redislabs.com',
+    port=16589,
+    password='3HPSWVLu0KdknewcZ3WCn3ndZydtZioH')
+
+# Neo4j config
+driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "12345678"))
+
+# SQL server config
+
+
+
+# Helper functions for Redis
+def get_hashtable_from_redis(key):
+    data = r.hgetall(key)
+    data = {k.decode(): v.decode() for k, v in data.items()}
+    return data
+
+# Helper functions for Neo4j
 def convert_node_to_dict(node):
     return dict(node)
-
-driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "12345678"))
 
 def execute_query_and_process_result(query):
     with driver.session() as session:
@@ -30,14 +49,11 @@ def execute_query_and_process_result(query):
     driver.close()
     return records
 
+# Endpoints
 
-
-
-
-
-# Takes a category as parameter, then returns 50 products
+# Returns 50 products based on category
 @app.route('/products/<category>', methods=['GET'])
-def get_products(category):
+def view_all_products(category):
     category = category.capitalize()
     query = """
     MATCH (category:Category {name:'""" + category + """'})
@@ -47,11 +63,14 @@ def get_products(category):
     products = execute_query_and_process_result(query)
     return jsonify(products)
 
-
-
 # Takes productID as parameter
 # Finds top 15 products based on average rating
 # Based on ProductID
+@app.route('/findMatchingProducts/<product_id>', methods=['GET'])
+def matching_products(product_id):
+    category = find_top_products(product_id)
+    return jsonify({"Category": category})
+
 def find_top_products(product_id):
     category_query = f"""
     MATCH (product:Product {{id: '{product_id}'}})
@@ -73,21 +92,14 @@ def find_top_products(product_id):
         result = session.run(top_products_query)
         top_products = [dict(record["product"]) for record in result]
 
-    # Close the Neo4j driver
     driver.close()
 
     return top_products
 
-@app.route('/findMatchingProducts/<product_id>', methods=['GET'])
-def category_endpoint(product_id):
-    category = find_top_products(product_id)
-    return jsonify({"Category": category})
-
-
-
-# Shows top 10 categories based on the degree centrality algorithm
-@app.route('/topCategories', methods=['GET'])
-def top_categories_endpoint():
+# Shows top 10 most popular categories
+# based on the degree centrality algorithm
+@app.route('/popularCategories', methods=['GET'])
+def popular_categories():
     query = """
     MATCH (c:Category)
     OPTIONAL MATCH (p:Product)-[:CATEGORIZED_AS]->(c)
@@ -103,52 +115,10 @@ def top_categories_endpoint():
 
     return jsonify({"categories": categories})
 
-
-
-# Finds top 50 items with the highest average rating
-@app.route('/topItems', methods=['GET'])
-def top_items_endpoint():
-    query = """
-    MATCH (p:Product)
-    WITH p, p.`Average Rating` AS averageRating
-    ORDER BY averageRating DESC
-    RETURN p
-    LIMIT 50
-    """
-
-    with driver.session() as session:
-        result = session.run(query)
-        items = [dict(record["p"]) for record in result]
-
-    return jsonify({"items": items})
-
-
-
-
-
-
-
-
-
-r = redis.Redis(
-    host='redis-16589.c250.eu-central-1-1.ec2.cloud.redislabs.com',
-    port=16589,
-    password='3HPSWVLu0KdknewcZ3WCn3ndZydtZioH')
-
-def get_key_from_redis(key):
-    data = r.get(key)
-    return data
-
-def get_hashtable_from_redis(key):
-    data = r.hgetall(key)
-    data = {k.decode(): v.decode() for k, v in data.items()}
-    return data
-
-
-
-# Finds top 50 items with the highest average rating
-@app.route('/plswork', methods=['GET'])
-def pls():
+# Takes the top 50 most popular products based on average rating
+# And writes it to Redis
+@app.route('/updateRedis', methods=['GET'])
+def update_popular_products_in_redis():
     query = """
     MATCH (p:Product)
     WITH p, p.`Average Rating` AS averageRating
@@ -162,18 +132,21 @@ def pls():
         items = [dict(record["p"]) for record in result]
 
     # Store items in Redis as a hashset
-    redis_key = "top_items"
+    redis_key = "popular_products"
+    
+    # Delete the existing hashtable
+    r.delete(redis_key)
+
+    # Update Redis with the new data
     redis_data = {str(i): json.dumps(items[i]) for i in range(len(items))}
     r.hmset(redis_key, redis_data)
 
-    return jsonify({"items": items})
+    return jsonify({"Products": items})
 
-
-
-
-@app.route('/redisData', methods=['GET'])
-def get_redis_data():
-    redis_key = "top_items"
+# Returns the top 50 popular products data written to Redis
+@app.route('/popularProducts', methods=['GET'])
+def get_products_from_redis():
+    redis_key = "popuar_products"
     data = get_hashtable_from_redis(redis_key)
     return jsonify(data)
 
@@ -186,15 +159,6 @@ def get_hashtable_from_redis(key):
         value_json = v.decode()
         parsed_data[key_str] = json.loads(value_json)
     return parsed_data
-
-
-
-
-
-
-
-
-
 
 if __name__ == '__main__':
     app.run()

@@ -17,6 +17,9 @@ def get_hashtable_from_redis(key):
     data = {k.decode(): v.decode() for k, v in data.items()}
     return data
 
+
+
+
 # Endpoint for retrieving keys from Redis
 @app.route('/api/getKey/<key>', methods=['GET'])
 def get_key(key):
@@ -25,6 +28,9 @@ def get_key(key):
         return jsonify({"message": "Key not found"})
     else:
         return jsonify({"value": data.decode()})
+    
+
+    
     
 # Endpoint for retrieving hashtables from Redis
 @app.route('/api/getHash/<key>', methods=['GET'])
