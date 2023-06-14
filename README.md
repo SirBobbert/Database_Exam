@@ -1,4 +1,4 @@
-﻿# Database_Exam
+# Database_Exam
 Group: 
 - Tobias Linge Jensen, cph-tl233@cphbusiness.dk
 - Mathias Brix Drejer, cph-md266@cphbusiness.dk
@@ -6,13 +6,14 @@ Group:
 
 Database Video Presentation:
 
+
 ## Table of Contents
-- [Folder Structure](#folder-structure)
+- [Folder Structure](#Folder-structure)
 - [Project Solution & Argumentation of Choices](#project-solution--argumentation-of-choices)
 - [Database Diagram](#database-diagram)
-- [Use cases](#use-cases)
+- [Use cases](#Use-cases)
 
-## Folder Structure <a name="folder-structure"></a>
+## Folder Structure <a name="Folder-structure"></a>
 
 ## Project Solution & Argumentation of Choices <a name="project-solution--argumentation-of-choices"></a>
 
@@ -31,11 +32,12 @@ Furthermore, Redis excels in caching frequently accessed Cart data, such as prod
 
 
 ## Database Diagram <a name="database-diagram"></a>
-Redis Cart:
 ![Cart in redis](cart-redis.png)
+![neo4jdb_overview](neo4jdb_overview.jpg)
+![sql-domain-model](sql-domain-model.png)
 
 
-## Use cases <a name="use-cases"></a>
+##  Use cases <a name="Use-cases">
 - As a Customer, I want to buy products
 - As a Customer, I want to be able to get recommendations based on popular items
 - As a Customer, I want to be able to see all products
