@@ -1,8 +1,8 @@
 # Database_Exam
 Group: 
-- Tobias Linge Jensen, cph-tl233@cphbusiness.dk
-- Mathias Brix Drejer, cph-md266@cphbusiness.dk
-- Robert Pallesen, cph-rp154@cphbusiness.dk
+- Tobias Linge Jensen - cph-tl233@cphbusiness.dk
+- Mathias Brix Drejer - cph-md266@cphbusiness.dk
+- Robert Pallesen - cph-rp154@cphbusiness.dk
 
 Database Video Presentation:
 https://youtu.be/vjdVAm3EqUg
