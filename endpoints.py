@@ -160,5 +160,51 @@ def get_hashtable_from_redis(key):
         parsed_data[key_str] = json.loads(value_json)
     return parsed_data
 
+
+
+
+# Add product in redis
+@app.route('/addCartProduct/', methods=['POST'])
+def add_cart_product():
+    user_id = request.json['user_id']
+    product_id = request.json['product_id']
+    product_data = request.json['product_data']
+
+    # Convert product_data dictionary to JSON string
+    product_data_json = json.dumps(product_data)
+
+    # Set the Hash Set in Redis
+    r.hset('Cart:' + user_id, product_id, product_data_json)
+
+    return 'Hash Set created successfully'
+
+
+# Remove product in redis
+@app.route('/removeCartProduct/', methods=['POST'])
+def remove_cart_product():
+    user_id = request.json['user_id']
+    product_id = request.json['product_id']
+
+    # Set the Hash Set in Redis
+    r.hdel('Cart:' + user_id, product_id)
+
+    return 'Product removed successfully'
+
+
+
+# Show all products in redis
+@app.route('/getAllCartProducts/', methods=['GET'])
+def get_all_cart_products():
+    user_id = request.json['user_id']
+    
+    cart_data = r.hgetall('Cart:' + str(user_id))
+
+    cart_data = {
+        k.decode(): json.loads(v.decode())
+        for k, v in cart_data.items()
+    }
+    return jsonify(cart_data)
+
+
 if __name__ == '__main__':
     app.run()
