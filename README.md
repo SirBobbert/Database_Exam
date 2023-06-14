@@ -5,7 +5,7 @@ Group:
 - Robert Pallesen, cph-rp154@cphbusiness.dk
 
 Database Video Presentation:
-
+https://youtu.be/vjdVAm3EqUg
 
 ## Table of Contents
 - [Folder Structure](#folder-structure)
