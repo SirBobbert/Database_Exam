@@ -31,6 +31,9 @@ Furthermore, Redis excels in caching frequently accessed Cart data, such as prod
 
 
 ## Database Diagram <a name="database-diagram"></a>
+Redis Cart:
+![Cart in redis](cart-redis.png)
+
 
 ## Use cases <a name="use-cases"></a>
 - As a Customer, I want to buy products
