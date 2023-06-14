@@ -11,7 +11,8 @@ Database Video Presentation:
 - [Folder Structure](#folder-structure)
 - [Project Solution & Argumentation of Choices](#project-solution--argumentation-of-choices)
 - [Database Diagram](#database-diagram)
-- [Use cases](#Use-cases)
+- [Use cases](#use-cases)
+- [Scripts to install](#scripts)
 
 ## Folder Structure <a name="folder-structure"></a>
 📄Main.py --> Contains our code for all our scripts, so that we can run them in postman.  
@@ -53,7 +54,7 @@ Furthermore, Redis excels in caching frequently accessed Cart data, such as prod
 
 
 
-# Installations
+## Installations <a name="scripts">
     pip install flask
     pip install neo4j
     pip install redis
