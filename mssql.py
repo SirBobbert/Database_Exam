@@ -3,18 +3,18 @@ import pyodbc
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 
+import endpoints
+
 app = Flask(__name__)
 
 load_dotenv()
 db_pw = os.getenv("MSSQL_PW")
 
 # Endpoint for executing the stored procedure
-@app.route('/api/executeStoredProc', methods=['POST'])
-def execute_stored_procedure():
+@app.route('/api/executeStoredProc/<userID>', methods=['POST'])
+def execute_stored_procedure(userID):
     # Parse the request data
-    request_data = request.get_json()
-    user_id = request_data['userID']
-    order_lines = request_data['orderLines']
+    order_lines = endpoints.get_all_cart_products(userID)
 
     # Establish a connection to the SQL Server database
     conn = pyodbc.connect(
@@ -45,7 +45,7 @@ def execute_stored_procedure():
         insert_query = "; ".join(insert_statements)
 
         # Execute the stored procedure
-        cursor.execute(f"DECLARE @typeOrderLines OrderLinesType, @userID int; SET @userID = ?; {insert_query}; EXEC dbo.InsertOrderWithOrderLines @userID, @typeOrderLines", user_id)
+        cursor.execute(f"DECLARE @typeOrderLines OrderLinesType, @userID int; SET @userID = ?; {insert_query}; EXEC dbo.InsertOrderWithOrderLines @userID, @typeOrderLines", userID)
 
         # Commit the transaction
         conn.commit()
@@ -54,9 +54,11 @@ def execute_stored_procedure():
         return jsonify({'message': 'Stored procedure executed successfully'})
 
     except Exception as e:
-        # Rollback the transaction in case of any error
+    # Rollback the transaction in case of any error
         conn.rollback()
-        # Optionally, handle the exception and return an error response
+    # Optionally, handle the exception and return an error response
+        return jsonify({'error': str(e)})
+
 
     finally:
         # Close the cursor and connection
