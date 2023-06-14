@@ -9,7 +9,7 @@ r = redis.Redis(
     password='3HPSWVLu0KdknewcZ3WCn3ndZydtZioH')
 
 # Neo4j config
-driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "12345678"))
+driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "changeme"))
 
 #----------------------------------------------------------------------------------------------------------------------------------------
 
