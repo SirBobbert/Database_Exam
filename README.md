@@ -14,6 +14,14 @@ Database Video Presentation:
 - [Use cases](#Use-cases)
 
 ## Folder Structure <a name="folder-structure"></a>
+📄Main.py --> Contains our code for all our scripts, so that we can run them in postman.  
+
+📁Script Screenshots --> Contains documentation of scripts when run.
+
+📁Endpoints --> Contains all of our endpoints used for Neo4j, Redis & MSSQL
+- 📁neo4jEndpoints.py --> Scripts for Neo4j
+- 📁redisEndpoints.py --> Scripts for Redis
+- 📁sqlEndpoints.py --> Scripts for Mssql
 
 ## Project Solution & Argumentation of Choices <a name="project-solution--argumentation-of-choices"></a>
 
