@@ -1,17 +1,6 @@
-import networkx as nx
 import redis
-import json
-import os
-import pyodbc
-
-from flask import Flask, app, jsonify, request
-from dotenv import load_dotenv
+from flask import jsonify
 from neo4j import GraphDatabase
-
-app = Flask(__name__)
-
-# Load ENV variables
-load_dotenv()
 
 # Redis config
 r = redis.Redis(
@@ -22,8 +11,9 @@ r = redis.Redis(
 # Neo4j config
 driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "12345678"))
 
+#----------------------------------------------------------------------------------------------------------------------------------------
 
-# Helper functions for Neo4j
+# Helper function
 def convert_node_to_dict(node):
     return dict(node)
 
@@ -40,8 +30,9 @@ def execute_query_and_process_result(query):
     driver.close()
     return records
 
+#----------------------------------------------------------------------------------------------------------------------------------------
 
-#Returns 50 products based on category
+# Returns 50 products based on category
 def view_all_products(category):
     category = category.capitalize()
     query = """
@@ -52,9 +43,9 @@ def view_all_products(category):
     products = execute_query_and_process_result(query)
     return jsonify(products)
 
-# Takes productID as parameter
-# Finds top 15 products based on average rating
-# Based on ProductID
+#----------------------------------------------------------------------------------------------
+
+# Finds top 15 best rated products in the same category as the productID's category
 def matching_products(productID):
     category = find_top_products(productID)
     return jsonify({"Category": category})
@@ -84,8 +75,9 @@ def find_top_products(productID):
 
     return top_products
 
-# Shows top 10 most popular categories
-# based on the degree centrality algorithm
+#----------------------------------------------------------------------------------------------
+
+# Shows top 10 most popular categories using the degree centrality algorithm
 def popular_categories():
     query = """
     MATCH (c:Category)
@@ -101,3 +93,5 @@ def popular_categories():
         categories = [{"name": record["name"], "degreeCentrality": record["degreeCentrality"]} for record in result]
 
     return jsonify({"categories": categories})
+
+#----------------------------------------------------------------------------------------------------------------------------------------

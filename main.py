@@ -16,18 +16,12 @@ app.route('/redis/removeCartProduct', methods=['POST'])(remove_cart_product)
 app.route('/redis/getCart/<userID>', methods=['GET'])(get_all_cart_products)
 
 # Neo4j endpoints
-# unødvendig?
 app.route('/neo4j/productsFromCategory/<category>', methods=['GET'])(view_all_products)
 app.route('/neo4j/matchingProducts/<productID>', methods=['GET'])(matching_products)
 app.route('/neo4j/popularCategories/', methods=['GET'])(popular_categories)
 
 # SQL endpoints
 app.route('/sql/insertProducts/<userID>', methods=['POST'])(insert_products)
-
-
-
-
-# Neo4j endpoints
 
 if __name__ == '__main__':
     app.run()

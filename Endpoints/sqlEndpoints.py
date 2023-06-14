@@ -1,12 +1,6 @@
-import networkx as nx
-import redis
-import json
-import os
-import pyodbc
-
-from flask import Flask, app, jsonify, request
+import redis, json, os, pyodbc
+from flask import jsonify
 from dotenv import load_dotenv
-from neo4j import GraphDatabase
 
 # Redis config
 r = redis.Redis(
@@ -14,7 +8,13 @@ r = redis.Redis(
     port=16589,
     password='3HPSWVLu0KdknewcZ3WCn3ndZydtZioH')
 
+# Load ENV
+load_dotenv()
+db_pw = os.getenv("MSSQL_PW")
 
+#----------------------------------------------------------------------------------------------------------------------------------------
+
+# Helper function
 def get_all_cart_products_for_sql(userID):
     cart_data = r.hgetall('Cart:' + str(userID))
 
@@ -31,8 +31,7 @@ def get_all_cart_products_for_sql(userID):
 
     return order_lines
 
-load_dotenv()
-db_pw = os.getenv("MSSQL_PW")
+#----------------------------------------------------------------------------------------------------------------------------------------
 
 # Endpoint for executing the stored procedure
 def insert_products(userID):
@@ -90,3 +89,5 @@ def insert_products(userID):
         # Close the cursor and connection
         cursor.close()
         conn.close()
+        
+#----------------------------------------------------------------------------------------------------------------------------------------

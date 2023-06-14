@@ -1,17 +1,7 @@
-import networkx as nx
-import redis
-import json
-import os
-import pyodbc
-
-from flask import Flask, app, jsonify, request
+import redis, json
+from flask import  jsonify, request
 from dotenv import load_dotenv
 from neo4j import GraphDatabase
-
-app = Flask(__name__)
-#--------------------------------------------------------------------------------------------------
-# Load ENV variables and Redis/Neo4j config
-load_dotenv()
 
 # Redis config
 r = redis.Redis(
@@ -21,16 +11,11 @@ r = redis.Redis(
 
 # Neo4j config
 driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "12345678"))
-#--------------------------------------------------------------------------------------------------
-# Helper functions for Redis
-# Gets entire hashset
-def get_hashtable_from_redis(key):
-    data = r.hgetall(key)
-    data = {k.decode(): v.decode() for k, v in data.items()}
-    return data
 
-# Gets hashset from key
-def get_hashtable_from_redis(key):
+#----------------------------------------------------------------------------------------------------------------------------------------
+
+# Helper function to get a parsed hashset from Redis
+def get_parsed_hashtable_from_redis(key):
     data = r.hgetall(key)
     parsed_data = {}
     for k, v in data.items():
@@ -38,11 +23,10 @@ def get_hashtable_from_redis(key):
         value_json = v.decode()
         parsed_data[key_str] = json.loads(value_json)
     return parsed_data
-#--------------------------------------------------------------------------------------------------
-# Endpoints for Redis
 
-# Takes the top 50 most popular products based on average rating
-# And writes it to Redis
+#----------------------------------------------------------------------------------------------------------------------------------------
+
+# Writes the top 50 most popular products based on average rating to redis
 def update_popular_products_in_redis():
     query = """
     MATCH (p:Product)
@@ -68,15 +52,17 @@ def update_popular_products_in_redis():
 
     return jsonify({"Products": items})
 
+#----------------------------------------------------------------------------------------------
 
-# Returns the top 50 popular products data written to Redis
+# Returns top 50 popular products
 def get_products_from_redis():
     redis_key = "popular_products"
-    data = get_hashtable_from_redis(redis_key)
+    data = get_parsed_hashtable_from_redis(redis_key)
     return jsonify(data)
 
+#----------------------------------------------------------------------------------------------
 
-# Add product in redis
+# Add product to cart
 def add_cart_product():
     user_id = request.json['user_id']
     product_id = request.json['product_id']
@@ -90,8 +76,9 @@ def add_cart_product():
 
     return 'Hash Set created successfully'
 
+#----------------------------------------------------------------------------------------------
 
-# Remove product in redis
+# Remove product from cart
 def remove_cart_product():
     user_id = request.json['user_id']
     product_id = request.json['product_id']
@@ -101,9 +88,9 @@ def remove_cart_product():
 
     return 'Product removed successfully'
 
+#----------------------------------------------------------------------------------------------
 
-
-# Show all products in redis
+# Show cart based on userID
 def get_all_cart_products(userID):
     cart_data = r.hgetall('Cart:' + str(userID))
 
@@ -121,4 +108,5 @@ def get_all_cart_products(userID):
     response_data = order_lines
 
     return jsonify(response_data)
-#--------------------------------------------------------------------------------------------------
+
+#----------------------------------------------------------------------------------------------------------------------------------------
