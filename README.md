@@ -26,9 +26,9 @@ Database Video Presentation:
 
 ## Project Solution & Argumentation of Choices <a name="project-solution--argumentation-of-choices"></a>
 
-We have in this project decided to make a platform where a user can buy items in a webshop, The user should also get recommendation based on popular items. We have used an amazon Api to populate our database with current items in the Amazon webshop. 
+We have in this project decided to make a platform where a user can buy items in a webshop, The user should also get recommendation based on popular items. We have used a webscraped dataset that contains data from amazon.co.uk to populate our database with current items in the Amazon webshop. 
 
-In MSSQL, we leverage the power of a rigid schema to effectively manage our users, orders, and order lines. The structured nature of MSSQL ensures data consistency and integrity, enabling us to define a well-defined structure for our user table. This structure allows us to store essential customer details, including names and addresses. With a predefined schema, we can ensure that data is stored accurately and uniformly, preserving the integrity of user-related information.
+In MSSQL, we leverage the power of a rigid schema to effectively manage our users, orders, and orderlines. The structured nature of MSSQL ensures data consistency and integrity, enabling us to define a well-defined structure for our user table. This structure allows us to store essential customer details, including names and addresses. With a predefined schema, we can ensure that data is stored accurately and uniformly, preserving the integrity of user-related information.
 
 MSSQL's ability to establish relationships between tables is crucial for managing order-related data. By utilizing tables such as orders and order lines, we can capture specific information related to each order. This includes unique order IDs, timestamps indicating when the orders were placed, and the products purchased by the customers. These relationships enable us to efficiently organize and retrieve order-specific data, providing valuable insights into our business operations.
 
