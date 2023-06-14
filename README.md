@@ -8,12 +8,12 @@ Database Video Presentation:
 
 
 ## Table of Contents
-- [Folder Structure](#Folder-structure)
+- [Folder Structure](#folder-structure)
 - [Project Solution & Argumentation of Choices](#project-solution--argumentation-of-choices)
 - [Database Diagram](#database-diagram)
 - [Use cases](#Use-cases)
 
-## Folder Structure <a name="Folder-structure"></a>
+## Folder Structure <a name="folder-structure"></a>
 
 ## Project Solution & Argumentation of Choices <a name="project-solution--argumentation-of-choices"></a>
 
@@ -37,7 +37,7 @@ Furthermore, Redis excels in caching frequently accessed Cart data, such as prod
 ![sql-domain-model](sql-domain-model.png)
 
 
-##  Use cases <a name="Use-cases">
+##  Use cases <a name="use-cases">
 - As a Customer, I want to buy products
 - As a Customer, I want to be able to get recommendations based on popular items
 - As a Customer, I want to be able to see all products
