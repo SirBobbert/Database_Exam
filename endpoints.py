@@ -272,6 +272,10 @@ def execute_stored_procedure(userID):
         # Commit the transaction
         conn.commit()
 
+        # Remove the Redis hashmap
+        r.delete('Cart:' + str(userID))
+
+
         # Return the response as JSON
         return jsonify({'message': 'Stored procedure executed successfully'})
 
@@ -285,6 +289,7 @@ def execute_stored_procedure(userID):
         # Close the cursor and connection
         cursor.close()
         conn.close()
+
 
 if __name__ == '__main__':
     app.run()
